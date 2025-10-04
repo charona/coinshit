@@ -4,6 +4,10 @@
 
 A cross-platform mobile and web app that lets users enter past purchases and see how much money they would have saved (or lost) if they had bought Bitcoin instead.
 
+## 🌐 Live Demo
+
+**Try it now:** [https://coinshit-f6bc8.web.app](https://coinshit-f6bc8.web.app)
+
 ## Features
 
 - 📱 **Cross-platform**: Runs on iOS, Android, and Web from a single codebase
@@ -20,7 +24,7 @@ A cross-platform mobile and web app that lets users enter past purchases and see
 - **Framework**: React Native + Expo
 - **Routing**: Expo Router (file-based routing)
 - **Backend**: Firebase (Firestore + Storage)
-- **APIs**: CoinGecko (Bitcoin prices)
+- **APIs**: Binance (live BTC price), CoinAPI (historical prices), Frankfurter (forex rates)
 - **Styling**: Inline styles with Bitcoin color palette
 - **Languages**: TypeScript
 
