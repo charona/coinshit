@@ -1,6 +1,8 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
+import { Platform } from 'react-native';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -15,6 +17,14 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Initialize App Check (web only for now)
+if (Platform.OS === 'web' && typeof window !== 'undefined') {
+  const appCheck = initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider('6LdTJt8rAAAAAGkMAIUpE_BtAA9cox_X1tL68CuV'),
+    isTokenAutoRefreshEnabled: true
+  });
+}
 
 // Initialize services
 export const db = getFirestore(app);

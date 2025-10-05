@@ -177,7 +177,7 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
               borderColor: errors.userName ? '#ef4444' : '#F7931A',
               fontSize: 18
             }}
-            placeholder="Your Name *"
+            placeholder="Name *"
             placeholderTextColor="#666"
             value={userName}
             onChangeText={(text) => {
@@ -193,7 +193,7 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
         </View>
 
         {/* Product Name */}
-        <View style={{ marginBottom: 12, flex: 1, minWidth: 250, paddingHorizontal: 6 }}>
+        <View style={{ marginBottom: 12, flex: 1, paddingHorizontal: 6 }}>
           <TextInput
             style={{
               backgroundColor: '#1a1a1a',
@@ -204,7 +204,7 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
               borderColor: errors.productName ? '#ef4444' : '#F7931A',
               fontSize: 18
             }}
-            placeholder="Product Name *"
+            placeholder="Product *"
             placeholderTextColor="#666"
             value={productName}
             onChangeText={(text) => {
@@ -223,7 +223,7 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
       {/* Row 2: Date, Amount, Currency, Photo */}
       <View style={{ flexDirection: 'row', marginHorizontal: -6 }}>
         {/* Purchase Date */}
-        <View style={{ marginBottom: 12, flex: 1, paddingHorizontal: 6 }}>
+        <View style={{ marginBottom: 12, flex: 1.5, paddingHorizontal: 6 }}>
         {Platform.OS === 'web' ? (
           <div
             onClick={(e) => {
@@ -244,6 +244,20 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
               alignItems: 'center'
             }}
           >
+            {!purchaseDate && (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 12,
+                  color: '#666',
+                  fontSize: 18,
+                  pointerEvents: 'none',
+                  zIndex: 1
+                }}
+              >
+                Date *
+              </div>
+            )}
             <input
               type="date"
               min="2011-01-01"
@@ -255,10 +269,9 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
                   if (errors.purchaseDate) setErrors({ ...errors, purchaseDate: undefined });
                 }
               }}
-              placeholder="Purchase Date *"
               style={{
                 backgroundColor: 'transparent',
-                color: purchaseDate ? '#fff' : '#666',
+                color: purchaseDate ? '#fff' : 'transparent',
                 padding: '0 12px',
                 border: 'none',
                 width: '100%',
@@ -266,7 +279,9 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
                 fontFamily: 'inherit',
                 outline: 'none',
                 cursor: 'pointer',
-                colorScheme: 'dark'
+                colorScheme: 'dark',
+                position: 'relative',
+                zIndex: 2
               }}
             />
             <style>{`
@@ -296,7 +311,7 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
               <Text style={{ color: purchaseDate ? '#fff' : '#666' }}>
                 {purchaseDate
                   ? purchaseDate.toISOString().split('T')[0]
-                  : 'Purchase Date * (2011-01-01 to today)'}
+                  : 'Date *'}
               </Text>
             </TouchableOpacity>
             {showDatePicker && (
@@ -325,7 +340,7 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
         </View>
 
         {/* Amount */}
-        <View style={{ marginBottom: 12, flex: 1, paddingHorizontal: 6 }}>
+        <View style={{ marginBottom: 12, flex: 1.5, paddingHorizontal: 6 }}>
           <TextInput
             style={{
               backgroundColor: '#1a1a1a',
@@ -354,14 +369,13 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
         </View>
 
         {/* Currency */}
-        <View style={{ marginBottom: 12, paddingHorizontal: 6 }}>
+        <View style={{ marginBottom: 12, flex: 0.7, paddingHorizontal: 6 }}>
           <TouchableOpacity
             onPress={() => setShowCurrencyPicker(!showCurrencyPicker)}
             style={{
               backgroundColor: '#1a1a1a',
               padding: 12,
               borderRadius: 8,
-              minWidth: 90,
               height: 48,
               alignItems: 'center',
               justifyContent: 'center',
@@ -374,7 +388,7 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
         </View>
 
         {/* Image Picker */}
-        <View style={{ marginBottom: 12, paddingHorizontal: 6 }}>
+        <View style={{ marginBottom: 12, flex: 0.7, paddingHorizontal: 6 }}>
           <TouchableOpacity
             onPress={pickImage}
             style={{
@@ -385,7 +399,6 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
               justifyContent: 'center',
               borderWidth: 1,
               borderColor: '#F7931A',
-              minWidth: 120,
               height: 48,
               overflow: 'hidden',
               position: 'relative'
@@ -449,7 +462,7 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
           <ActivityIndicator color="#000" />
         ) : (
           <Text style={{ color: '#000', fontWeight: 'bold', fontSize: 16 }}>
-            Submit Entry
+            Submit
           </Text>
         )}
       </TouchableOpacity>
