@@ -109,6 +109,14 @@ export default function EntryDetail() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#000' }}>
+      {/* Back Button */}
+      <View style={{ padding: 16, backgroundColor: '#1a1a1a' }}>
+        <TouchableOpacity onPress={() => router.back()} style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={{ color: '#F7931A', fontSize: 24, marginRight: 8 }}>←</Text>
+          <Text style={{ color: '#F7931A', fontSize: 16 }}>Back</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Image */}
       <TouchableOpacity onPress={() => setImageModalVisible(true)}>
         <Image
