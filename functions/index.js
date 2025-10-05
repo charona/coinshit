@@ -1,6 +1,6 @@
 const {onCall} = require('firebase-functions/v2/https');
 const {initializeApp} = require('firebase-admin/app');
-const {getFirestore} = require('firebase-admin/firestore');
+const {getFirestore, FieldValue} = require('firebase-admin/firestore');
 
 initializeApp();
 
@@ -37,7 +37,7 @@ exports.createEntry = onCall(
         purchaseDate: new Date(purchaseDate),
         fiatAmount: parseFloat(fiatAmount),
         currency,
-        createdAt: new Date(),
+        createdAt: FieldValue.serverTimestamp(),
       });
 
       console.log('Entry created successfully:', entryRef.id);
