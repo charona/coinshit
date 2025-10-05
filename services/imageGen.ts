@@ -1,13 +1,42 @@
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { storage } from './firebase';
+
 /**
  * Generate a cartoon-like placeholder image URL for a product
- * Using a placeholder service until AI image generation is implemented
+ * Caches SVG in Firebase Storage
  */
-export function generatePlaceholderImage(productName: string): string {
+export async function generatePlaceholderImage(productName: string): Promise<string> {
   // Use a placeholder service with a generated seed from product name
   const seed = hashString(productName);
+  const filename = `placeholders/${seed}.svg`;
 
-  // Using DiceBear for cartoon avatars (free, no API key needed)
-  return `https://api.dicebear.com/7.x/shapes/svg?seed=${seed}&backgroundColor=F7931A`;
+  try {
+    // Check if already cached in Firebase Storage
+    const storageRef = ref(storage, filename);
+    try {
+      const url = await getDownloadURL(storageRef);
+      return url;
+    } catch (error) {
+      // Not cached, fetch and cache it
+    }
+
+    // Fetch SVG from DiceBear
+    const svgUrl = `https://api.dicebear.com/7.x/shapes/svg?seed=${seed}&backgroundColor=F7931A`;
+    const response = await fetch(svgUrl);
+    const svgText = await response.text();
+
+    // Upload to Firebase Storage
+    await uploadString(storageRef, svgText, 'raw', {
+      contentType: 'image/svg+xml'
+    });
+
+    // Get the download URL
+    return await getDownloadURL(storageRef);
+  } catch (error) {
+    console.error('Error caching placeholder image:', error);
+    // Fallback to direct URL
+    return `https://api.dicebear.com/7.x/shapes/svg?seed=${seed}&backgroundColor=F7931A`;
+  }
 }
 
 /**

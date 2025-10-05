@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, ActivityIndicator, View, Text } from 'react-native';
+import { ActivityIndicator, View, Text, TouchableOpacity } from 'react-native';
 import { collection, query, orderBy, limit, startAfter, where, onSnapshot, DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { Entry } from '../utils/types';
 import EntryCard from './EntryCard';
 
 interface EntryListProps {
-  filterUserName?: string;
+  filterText?: string;
 }
 
 const ENTRIES_PER_PAGE = 20;
 
-export default function EntryList({ filterUserName }: EntryListProps) {
+export default function EntryList({ filterText }: EntryListProps) {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -25,22 +25,12 @@ export default function EntryList({ filterUserName }: EntryListProps) {
     setHasMore(true);
     setLoading(true);
 
-    // Build query
-    let q = query(
+    // Build query (always fetch all, filter client-side for multi-field search)
+    const q = query(
       collection(db, 'entries'),
       orderBy('createdAt', 'desc'),
       limit(ENTRIES_PER_PAGE)
     );
-
-    // Add filter if userName is provided
-    if (filterUserName && filterUserName.trim()) {
-      q = query(
-        collection(db, 'entries'),
-        where('userName', '==', filterUserName.trim()),
-        orderBy('createdAt', 'desc'),
-        limit(ENTRIES_PER_PAGE)
-      );
-    }
 
     // Subscribe to real-time updates
     const unsubscribe = onSnapshot(
@@ -75,7 +65,20 @@ export default function EntryList({ filterUserName }: EntryListProps) {
     );
 
     return () => unsubscribe();
-  }, [filterUserName]);
+  }, []);
+
+  // Filter entries client-side
+  const filteredEntries = filterText && filterText.trim()
+    ? entries.filter(entry => {
+        const search = filterText.toLowerCase();
+        return (
+          entry.userName.toLowerCase().includes(search) ||
+          entry.productName.toLowerCase().includes(search) ||
+          entry.currency.toLowerCase().includes(search) ||
+          entry.purchaseDate.toISOString().split('T')[0].includes(search)
+        );
+      })
+    : entries;
 
   const loadMore = async () => {
     if (!hasMore || loadingMore || !lastDoc) return;
@@ -83,22 +86,12 @@ export default function EntryList({ filterUserName }: EntryListProps) {
     setLoadingMore(true);
 
     // Build query for next page
-    let q = query(
+    const q = query(
       collection(db, 'entries'),
       orderBy('createdAt', 'desc'),
       startAfter(lastDoc),
       limit(ENTRIES_PER_PAGE)
     );
-
-    if (filterUserName && filterUserName.trim()) {
-      q = query(
-        collection(db, 'entries'),
-        where('userName', '==', filterUserName.trim()),
-        orderBy('createdAt', 'desc'),
-        startAfter(lastDoc),
-        limit(ENTRIES_PER_PAGE)
-      );
-    }
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const newEntries: Entry[] = [];
@@ -134,30 +127,33 @@ export default function EntryList({ filterUserName }: EntryListProps) {
     );
   }
 
-  if (entries.length === 0) {
+  if (filteredEntries.length === 0 && !loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
         <Text style={{ color: '#999', fontSize: 16 }}>
-          {filterUserName ? 'No entries found for this user' : 'No entries yet. Be the first to add one!'}
+          {filterText ? 'No entries match your filter' : 'No entries yet. Be the first to add one!'}
         </Text>
       </View>
     );
   }
 
   return (
-    <FlatList
-      data={entries}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => <EntryCard entry={item} />}
-      onEndReached={loadMore}
-      onEndReachedThreshold={0.5}
-      ListFooterComponent={
-        loadingMore ? (
-          <View style={{ padding: 20 }}>
-            <ActivityIndicator color="#F7931A" />
-          </View>
-        ) : null
-      }
-    />
+    <View>
+      {filteredEntries.map((item) => (
+        <EntryCard key={item.id} entry={item} />
+      ))}
+      {loadingMore && (
+        <View style={{ padding: 20 }}>
+          <ActivityIndicator color="#F7931A" />
+        </View>
+      )}
+      {hasMore && !loadingMore && entries.length > 0 && (
+        <TouchableOpacity onPress={loadMore} style={{ padding: 20, alignItems: 'center' }}>
+          <Text style={{ color: '#F7931A', fontSize: 14 }}>
+            Load More
+          </Text>
+        </TouchableOpacity>
+      )}
+    </View>
   );
 }

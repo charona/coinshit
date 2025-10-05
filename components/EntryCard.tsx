@@ -47,7 +47,7 @@ export default function EntryCard({ entry }: EntryCardProps) {
     return null;
   }
 
-  const displayDate = new Date(entry.purchaseDate).toLocaleDateString();
+  const displayDate = new Date(entry.purchaseDate).toISOString().split('T')[0];
   const statusColor = calculated.saved ? '#10b981' : '#ef4444';
   const statusText = calculated.saved ? 'SAVED' : 'LOST';
 

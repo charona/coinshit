@@ -103,7 +103,7 @@ export default function EntryDetail() {
     );
   }
 
-  const displayDate = new Date(entry.purchaseDate).toLocaleDateString();
+  const displayDate = new Date(entry.purchaseDate).toISOString().split('T')[0];
   const statusColor = calculated.saved ? '#10b981' : '#ef4444';
   const statusText = calculated.saved ? 'SAVED' : 'LOST';
 
@@ -118,7 +118,7 @@ export default function EntryDetail() {
             height: 300,
             backgroundColor: '#1a1a1a'
           }}
-          resizeMode="cover"
+          resizeMode="contain"
         />
       </TouchableOpacity>
 
@@ -148,10 +148,17 @@ export default function EntryDetail() {
             </Text>
           </View>
 
-          <View>
+          <View style={{ marginBottom: 12 }}>
             <Text style={{ color: '#999', fontSize: 12, marginBottom: 4 }}>Bitcoin That Could Have Been Bought</Text>
             <Text style={{ color: '#F7931A', fontSize: 16, fontWeight: 'bold' }}>
               {calculated.btcAmount.toFixed(8)} BTC
+            </Text>
+          </View>
+
+          <View>
+            <Text style={{ color: '#999', fontSize: 12, marginBottom: 4 }}>That BTC would now be worth</Text>
+            <Text style={{ color: '#F7931A', fontSize: 16, fontWeight: 'bold' }}>
+              {formatCurrency(calculated.currentValue, entry.currency)}
             </Text>
           </View>
         </View>
