@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { getFunctions } from 'firebase/functions';
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 import { Platform } from 'react-native';
 
@@ -34,3 +35,4 @@ if (Platform.OS === 'web' && typeof window !== 'undefined') {
 // Initialize services
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+export const functions = getFunctions(app);

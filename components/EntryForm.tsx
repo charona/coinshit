@@ -11,9 +11,9 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
-import { storage } from '../services/firebase';
+import { storage, functions } from '../services/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { getFunctions, httpsCallable } from 'firebase/functions';
+import { httpsCallable } from 'firebase/functions';
 import { detectUserCurrency } from '../utils/currency';
 import { Currency, CURRENCIES } from '../utils/types';
 import { generatePlaceholderImage } from '../services/imageGen';
@@ -133,9 +133,10 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
       }
 
       // Create entry via Cloud Function (with App Check validation)
-      const functions = getFunctions();
       const createEntry = httpsCallable(functions, 'createEntry');
-      await createEntry({
+
+      console.log('Calling createEntry function...');
+      const result = await createEntry({
         userName: userName.trim(),
         productName: productName.trim(),
         imageUrl,
@@ -143,6 +144,7 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
         fiatAmount: parseFloat(fiatAmount),
         currency
       });
+      console.log('Function result:', result);
 
       // Reset form
       setUserName('');

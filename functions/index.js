@@ -11,6 +11,8 @@ exports.createEntry = onCall(
     consumeAppCheckToken: true, // Prevent token reuse
   },
   async (request) => {
+    console.log('createEntry called with data:', request.data);
+    console.log('App Check verified:', request.app ? 'Yes' : 'No');
     // Validate input data
     const {userName, productName, imageUrl, purchaseDate, fiatAmount, currency} = request.data;
 
@@ -27,16 +29,22 @@ exports.createEntry = onCall(
     }
 
     // Create entry in Firestore
-    const entryRef = await getFirestore().collection('entries').add({
-      userName: userName.trim(),
-      productName: productName.trim(),
-      imageUrl,
-      purchaseDate: new Date(purchaseDate),
-      fiatAmount: parseFloat(fiatAmount),
-      currency,
-      createdAt: new Date(),
-    });
+    try {
+      const entryRef = await getFirestore().collection('entries').add({
+        userName: userName.trim(),
+        productName: productName.trim(),
+        imageUrl,
+        purchaseDate: new Date(purchaseDate),
+        fiatAmount: parseFloat(fiatAmount),
+        currency,
+        createdAt: new Date(),
+      });
 
-    return {success: true, id: entryRef.id};
+      console.log('Entry created successfully:', entryRef.id);
+      return {success: true, id: entryRef.id};
+    } catch (error) {
+      console.error('Error creating entry in Firestore:', error);
+      throw new Error('Failed to create entry: ' + error.message);
+    }
   }
 );
