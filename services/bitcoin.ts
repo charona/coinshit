@@ -71,7 +71,7 @@ async function getHistoricalBTCUSD(date: Date): Promise<number> {
       return docSnap.data().price;
     }
   } catch (error) {
-    console.error('Error reading from Firestore cache:', error);
+    console.error('Error reading BTC price from Firestore cache:', error);
   }
 
   // Fetch from CoinAPI
@@ -87,15 +87,20 @@ async function getHistoricalBTCUSD(date: Date): Promise<number> {
 
     const price = response.data.rate;
 
-    // Cache in Firestore
+    // Cache in Firestore (silently fail if already exists or permission denied)
     try {
-      await setDoc(doc(db, 'btc_prices', cacheKey), {
-        price,
-        date: dateString,
-        timestamp: new Date()
-      });
+      const docRef = doc(db, 'btc_prices', cacheKey);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        await setDoc(docRef, {
+          price,
+          date: dateString,
+          timestamp: new Date()
+        });
+      }
     } catch (error) {
-      console.error('Error caching to Firestore:', error);
+      // Silently fail - caching is optional
     }
 
     return price;
@@ -136,17 +141,22 @@ async function getExchangeRate(from: string, to: Currency, date: Date): Promise<
       throw new Error(`Exchange rate for ${to} not found`);
     }
 
-    // Cache in Firestore
+    // Cache in Firestore (silently fail if already exists or permission denied)
     try {
-      await setDoc(doc(db, 'exchange_rates', cacheKey), {
-        rate,
-        from,
-        to,
-        date: dateString,
-        timestamp: new Date()
-      });
+      const docRef = doc(db, 'exchange_rates', cacheKey);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        await setDoc(docRef, {
+          rate,
+          from,
+          to,
+          date: dateString,
+          timestamp: new Date()
+        });
+      }
     } catch (error) {
-      console.error('Error caching exchange rate to Firestore:', error);
+      // Silently fail - caching is optional
     }
 
     return rate;

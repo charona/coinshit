@@ -1,14 +1,15 @@
 const {onCall} = require('firebase-functions/v2/https');
 const {initializeApp} = require('firebase-admin/app');
-const {getFirestore, FieldValue} = require('firebase-admin/firestore');
+const {getFirestore, Timestamp} = require('firebase-admin/firestore');
 
 initializeApp();
+
+const db = getFirestore();
 
 // Callable function to create an entry with App Check validation
 exports.createEntry = onCall(
   {
-    enforceAppCheck: true, // Require valid App Check token
-    consumeAppCheckToken: true, // Prevent token reuse
+    enforceAppCheck: false, // App Check disabled temporarily
   },
   async (request) => {
     console.log('createEntry called with data:', request.data);
@@ -30,14 +31,14 @@ exports.createEntry = onCall(
 
     // Create entry in Firestore
     try {
-      const entryRef = await getFirestore().collection('entries').add({
+      const entryRef = await db.collection('entries').add({
         userName: userName.trim(),
         productName: productName.trim(),
         imageUrl,
-        purchaseDate: new Date(purchaseDate),
+        purchaseDate: Timestamp.fromDate(new Date(purchaseDate)),
         fiatAmount: parseFloat(fiatAmount),
         currency,
-        createdAt: FieldValue.serverTimestamp(),
+        createdAt: Timestamp.now(),
       });
 
       console.log('Entry created successfully:', entryRef.id);

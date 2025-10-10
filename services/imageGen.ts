@@ -25,16 +25,20 @@ export async function generatePlaceholderImage(productName: string): Promise<str
     const response = await fetch(svgUrl);
     const svgText = await response.text();
 
-    // Upload to Firebase Storage
-    await uploadString(storageRef, svgText, 'raw', {
-      contentType: 'image/svg+xml'
-    });
-
-    // Get the download URL
-    return await getDownloadURL(storageRef);
+    // Upload to Firebase Storage (silently fail if no permission)
+    try {
+      await uploadString(storageRef, svgText, 'raw', {
+        contentType: 'image/svg+xml'
+      });
+      // Get the download URL
+      return await getDownloadURL(storageRef);
+    } catch (uploadError) {
+      // Can't cache - fallback to direct URL
+      return `https://api.dicebear.com/7.x/shapes/svg?seed=${seed}&backgroundColor=F7931A`;
+    }
   } catch (error) {
-    console.error('Error caching placeholder image:', error);
     // Fallback to direct URL
+    const seed = hashString(productName);
     return `https://api.dicebear.com/7.x/shapes/svg?seed=${seed}&backgroundColor=F7931A`;
   }
 }

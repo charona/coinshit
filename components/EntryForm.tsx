@@ -58,7 +58,7 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [4, 3],
       quality: 0.7,
@@ -247,20 +247,20 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
               alignItems: 'center'
             }}
           >
-            {!purchaseDate && (
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 12,
-                  color: '#666',
-                  fontSize: 18,
-                  pointerEvents: 'none',
-                  zIndex: 1
-                }}
-              >
-                Date *
-              </div>
-            )}
+            {/* Show date in YYYY-MM-DD format or placeholder */}
+            <div
+              style={{
+                position: 'absolute' as const,
+                left: 12,
+                color: purchaseDate ? '#fff' : '#666',
+                fontSize: 18,
+                zIndex: 3,
+                pointerEvents: 'none' as const
+              }}
+            >
+              {purchaseDate ? purchaseDate.toISOString().split('T')[0] : 'Date *'}
+            </div>
+            {/* Hidden date input for picker functionality */}
             <input
               type="date"
               min="2011-01-01"
@@ -274,7 +274,7 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
               }}
               style={{
                 backgroundColor: 'transparent',
-                color: purchaseDate ? '#fff' : 'transparent',
+                color: 'transparent',
                 padding: '0 12px',
                 border: 'none',
                 width: '100%',
@@ -284,7 +284,8 @@ export default function EntryForm({ onEntryCreated }: EntryFormProps) {
                 cursor: 'pointer',
                 colorScheme: 'dark',
                 position: 'relative',
-                zIndex: 2
+                zIndex: 2,
+                opacity: 0
               }}
             />
             <style>{`

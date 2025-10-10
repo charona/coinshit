@@ -19,18 +19,19 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize App Check (web only for now)
-if (Platform.OS === 'web' && typeof window !== 'undefined') {
-  try {
-    const appCheck = initializeAppCheck(app, {
-      provider: new ReCaptchaV3Provider('6LdTJt8rAAAAAGkMAIUpE_BtAA9cox_X1tL68CuV'),
-      isTokenAutoRefreshEnabled: true
-    });
-    console.log('App Check initialized successfully');
-  } catch (error) {
-    console.error('Error initializing App Check:', error);
-  }
-}
+// App Check disabled due to configuration issues
+// TODO: Re-enable with proper reCAPTCHA Enterprise setup
+// if (Platform.OS === 'web' && typeof window !== 'undefined') {
+//   try {
+//     const appCheck = initializeAppCheck(app, {
+//       provider: new ReCaptchaV3Provider('6LdTJt8rAAAAAGkMAIUpE_BtAA9cox_X1tL68CuV'),
+//       isTokenAutoRefreshEnabled: true
+//     });
+//     console.log('App Check initialized successfully');
+//   } catch (error) {
+//     console.error('Error initializing App Check:', error);
+//   }
+// }
 
 // Initialize services
 export const db = getFirestore(app);
